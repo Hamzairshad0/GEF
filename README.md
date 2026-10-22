@@ -51,7 +51,7 @@ One-time setup:
    | `APP_KEY` | the `APP_KEY` line from your local `.env` (or a new one from `php artisan key:generate --show`) |
    | `APP_URL` | your Vercel URL, e.g. `https://gef.vercel.app` |
    | `DB_CONNECTION` | `pgsql` |
-   | `DB_URL` | the Neon connection string (`postgresql://…?sslmode=require`) |
+   | `DB_URL` | not needed when Neon is connected through Vercel Storage — Laravel falls back to the `DATABASE_URL` it adds |
 
 4. **Create tables and load the content** into Neon, from your computer (PowerShell, inside this folder):
 
