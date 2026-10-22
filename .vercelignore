@@ -1,0 +1,17 @@
+# Never upload secrets or local data
+.env
+.env.*
+!.env.example
+database/*.sqlite*
+
+# Rebuilt by Vercel (composer) or not needed in production
+vendor
+node_modules
+tests
+storage/logs/*
+storage/framework/views/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+.phpunit.result.cache
+.claude
+.github

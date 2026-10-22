@@ -1,0 +1,39 @@
+# Deploys to Vercel on every push to main.
+# Used instead of Vercel's Git integration because the Vercel account is linked
+# to a different GitHub account than the one that owns this repository.
+#
+# Repository secrets needed (Settings → Secrets and variables → Actions):
+#   VERCEL_TOKEN       – from vercel.com/account/tokens
+#   VERCEL_ORG_ID      – Vercel team ID (team Settings → General → Team ID)
+#   VERCEL_PROJECT_ID  – project ID (project Settings → General → Project ID)
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Pull Vercel project settings
+        run: npx --yes vercel@62.7.0 pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      # Uploads the source; Vercel installs Composer packages and builds the PHP function remotely
+      - name: Deploy to production
+        run: npx --yes vercel@62.7.0 deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
