@@ -12,8 +12,10 @@
             "excludeFiles": "{node_modules/**,public/uploads/**,tests/**,storage/framework/views/**,database/*.sqlite}"
         }
     },
-    "rewrites": [
-        { "source": "/(.*)", "destination": "/api/index.php" }
+    "routes": [
+        { "src": "/(build|uploads|images)/(.*)", "dest": "/$1/$2" },
+        { "src": "/(favicon\\.ico|favicon\\.png|robots\\.txt)", "dest": "/$1" },
+        { "src": "/(.*)", "dest": "/api/index.php" }
     ],
     "env": {
         "APP_ENV": "production",
