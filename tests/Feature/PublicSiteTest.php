@@ -3,7 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\ContactMessage;
+use App\Models\Document;
 use App\Models\Donation;
+use App\Models\Gallery;
+use App\Models\GalleryImage;
+use App\Models\HeroSlide;
+use App\Models\Person;
 use App\Models\Post;
 use App\Models\VolunteerApplication;
 use Database\Seeders\ContentSeeder;
@@ -39,6 +44,24 @@ class PublicSiteTest extends TestCase
             ->assertSee('Sponsor a Disabled Child')
             ->assertSee('Achieved Milestones')
             ->assertSee('Stories Of Hope');
+    }
+
+    public function test_home_hero_falls_back_to_default_slides_when_table_is_empty(): void
+    {
+        HeroSlide::query()->delete();
+
+        $this->get('/')->assertOk()->assertSee('Sponsor an Orphan')->assertSee('data-hero-image', false);
+    }
+
+    public function test_content_seeder_can_be_rerun_without_duplicates(): void
+    {
+        $counts = fn () => [Post::count(), Person::count(), Document::count(), Gallery::count(), GalleryImage::count()];
+        $before = $counts();
+
+        $this->seed(ContentSeeder::class);
+
+        $this->assertSame($before, $counts());
+        $this->assertSame([54, 36, 49, 16, 239], $before);
     }
 
     public function test_every_post_is_reachable_on_its_original_url(): void

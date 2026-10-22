@@ -14,8 +14,15 @@ class PageController extends Controller
 {
     public function home(): View
     {
+        $slides = HeroSlide::where('is_active', true)->orderBy('sort')->get();
+
+        // Never render an empty hero: fall back to the default slides from config
+        if ($slides->isEmpty()) {
+            $slides = collect(config('ghazali.hero_slides'))->map(fn ($slide) => new HeroSlide($slide));
+        }
+
         return view('pages.home', [
-            'slides' => HeroSlide::where('is_active', true)->orderBy('sort')->get(),
+            'slides' => $slides,
             'causes' => Post::ofType('campaign')->get(),
             'stories' => Post::ofType('story')->get(),
         ]);
