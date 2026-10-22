@@ -27,6 +27,37 @@ Admin panel: `/admin` — the login is `ADMIN_EMAIL` / `ADMIN_PASSWORD` from `.e
 
 Run tests: `php artisan test`
 
+## Deploying to Vercel
+
+The repo is set up for Vercel with the community PHP runtime (`vercel-php`, PHP 8.4): see `vercel.json` and `api/index.php`.
+Every push to `main` on GitHub redeploys automatically once the project is connected.
+
+**Before every push:** run `npm run build`, then commit `public/build`. Vercel serves the prebuilt CSS/JS and does not run Node.
+
+One-time setup:
+
+1. **Database** — Vercel's disk is read-only, so SQLite can't be used in production. In Vercel go to *Storage → Create → Neon (Postgres)*, free plan, and connect it to the project.
+2. **Import the repo** — *Add New → Project → Import Git Repository*. If `Hamzairshad0/GEF` isn't listed, click *Adjust GitHub App Permissions* and install the Vercel app on the `Hamzairshad0` GitHub account with access to `GEF`. Leave Framework Preset as *Other*; `vercel.json` sets everything else.
+3. **Environment variables** (*Settings → Environment Variables*):
+
+   | Name | Value |
+   |---|---|
+   | `APP_KEY` | the `APP_KEY` line from your local `.env` (or a new one from `php artisan key:generate --show`) |
+   | `APP_URL` | your Vercel URL, e.g. `https://gef.vercel.app` |
+   | `DB_CONNECTION` | `pgsql` |
+   | `DB_URL` | the Neon connection string (`postgresql://…?sslmode=require`) |
+
+4. **Create tables and load the content** into Neon, from your computer (PowerShell, inside this folder):
+
+   ```powershell
+   $env:DB_CONNECTION="pgsql"; $env:DB_URL="postgresql://...your Neon URL..."; $env:ADMIN_PASSWORD="choose-a-strong-password"
+   php -d extension=pdo_pgsql artisan migrate --seed --force
+   ```
+
+5. **Redeploy** from the Vercel dashboard (*Deployments → … → Redeploy*) so the new variables are picked up.
+
+Limits on Vercel: admin **image uploads** are disabled (read-only disk) — add images to `public/uploads` in the repo instead. Text edits, slides, donations, messages and volunteer forms all work.
+
 ## What's where
 
 | Area | Files |
